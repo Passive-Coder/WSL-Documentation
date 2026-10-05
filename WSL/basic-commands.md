@@ -223,13 +223,15 @@ On versions that support recovery, unregistering a WSL 2 distribution moves its 
 
 Retained disks continue to consume disk space. Cleanup runs after the recovery window while the WSL service is active. If Windows or the service is stopped, cleanup resumes the next time WSL is used. Files that are unavailable or in use are retried later. Recovery is not a backup: manually deleting the recovery directory, removing its parent directory (including by uninstalling a Store app), or losing the disk can still destroy the retained data.
 
-To permanently delete a distribution immediately and skip recovery, place `--force` after its name:
+To permanently delete a distribution and skip the 24-hour recovery window, place `--force` after its name:
 
 ```powershell
 wsl --unregister <DistributionName> --force
 ```
 
 Scripts that need to reclaim the disk space immediately should use this option. If WSL cannot safely move a disk into recovery storage, unregistering fails without silently falling back to permanent deletion; the disk remains in its original or recovery location.
+
+If an interrupted unregister or restore has left a pending recovery record and its disk is unavailable, `--force` commits permanent deletion and makes that record unavailable for restoration. WSL keeps the disk identity so it can retry physical deletion when the disk becomes accessible. Disk space is reclaimed only after physical deletion succeeds.
 
 ### Restore an unregistered WSL 2 distribution
 
@@ -244,6 +246,8 @@ Restore by name, or by recovery ID when more than one deleted distribution has t
 ```powershell
 wsl --restore-distribution <DistributionNameOrID>
 ```
+
+If the selector matches both a distribution name and a different recovery ID, WSL refuses the ambiguous selection. Use the full ID, including braces, shown by `wsl --list --deleted` to select that recovery record explicitly. Distribution names beginning with a hyphen can also be restored by name.
 
 If a currently registered distribution already has that name, specify a new name:
 
