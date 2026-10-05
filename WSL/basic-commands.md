@@ -231,6 +231,8 @@ wsl --unregister <DistributionName> --force
 
 Scripts that need to reclaim the disk space immediately should use this option. If WSL cannot safely move a disk into recovery storage, unregistering fails without silently falling back to permanent deletion; the disk remains in its original or recovery location.
 
+The same command can delete a retained WSL 2 distribution by name if no currently registered distribution has that name. If multiple recovery records match, WSL refuses to choose a disk.
+
 If an interrupted unregister or restore has left a pending recovery record and its disk is unavailable, `--force` commits permanent deletion and makes that record unavailable for restoration. WSL keeps the disk identity so it can retry physical deletion when the disk becomes accessible. Disk space is reclaimed only after physical deletion succeeds.
 
 ### Restore an unregistered WSL 2 distribution
